@@ -17,17 +17,13 @@ const middilewares = require('../middlewares/auth')
 router.post("/blogs",middilewares.authenticate,BlogController.createNewBlog)
 router.get("/blogs",middilewares.authenticate,BlogController.getAllBlogs)
 router.get("/getBlogs",middilewares.authenticate,BlogController.getBlogs)
-router.put("/blogs/:blogId",middilewares.authenticate,middilewares.Authorisation,BlogController.updateBlog)
-router.delete("/blogs/:blogId",middilewares.authenticate,middilewares.Authorisation,BlogController.deleteBlog)
+router.put("/blogs/:blogId",middilewares.authenticate,middilewares.authorise,BlogController.updateBlog)
+router.delete("/blogs/:blogId",middilewares.authenticate,middilewares.authorise,BlogController.deleteBlog)
 router.delete("/deleteBlogs",middilewares.authenticate,BlogController.deleteAllBlogs)
 
-
- 
- 
- 
   
 router.all("/*",function(req,res){
-    res.status(404).send({status:false,msg:"make sure your endpont is correct"})
+    res.status(404).send({status:false,msg:"make sure your EndPoint is correct"})
 })
  
 

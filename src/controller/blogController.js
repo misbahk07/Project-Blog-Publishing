@@ -22,6 +22,8 @@ let createNewBlog = async function (req, res) {
         if (!findAuthor)
             return res.status(404).send({ status: false, msg: "Author with the given AuthorId does not exists." })
 
+        if(isPublished===true)
+        data.publishedAt=Date.now()    
 
         let saveData = await BlogModel.create(data)
         res.status(201).send({ status: true, msg: saveData })
@@ -132,16 +134,32 @@ const deleteBlog = async function (req, res) {
 let deleteAllBlogs = async function (req, res) {
     try {
 
-        let data = req.query
-        data.authorId=req.decodeToken
-        data.isDeleted=false
-    
-      let findBlogs = await BlogModel.find(data)
-        
-       if (findBlogs.length==0) return res.status(404).send({ status: false, msg: " " })
- 
+        let filter={isDeleted:false,authorId:req.authorId}
+        let {category,subcategory,tags,authorId}=req.query
 
-        let deleteBlogs = await BlogModel.updateMany(data,{ isDeleted : true, deletedAt: new Date() })
+        if(authorId)
+        if(!isValidObjectId(authorId))
+        return res.status(400).send({status:false,msg:"author Id is invalid."})
+
+        filter.authorId=authorId
+
+        if(category !=null)
+        filter.category=category
+
+        if(subcategory != null)
+        filter.subcategory=subcategory
+
+        if(tags != null)
+        filter.tags=tags
+
+        let blogs=await BlogModel.findOne(filter)
+        if(blogs.length==0)
+        return res.status(404).send({status:false,msg:"No record found."})
+
+        if(blogs.authorId._id.toString() !== req.authorId)
+        return res.status(403).send({status:false,msg:"Authorization failed!"})
+
+        let deleteBlogs = await BlogModel.updateMany(filter,{ isDeleted : true, deletedAt: new Date() })
 
         return res.status(200).send({ status: true, deleteBlogs, msg: "blogs deleted successfully." })
     } catch (error) {
