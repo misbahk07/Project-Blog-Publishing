@@ -153,7 +153,7 @@ let deleteAllBlogs = async function (req, res) {
         filter.tags=tags
 
         let blogs=await BlogModel.findOne(filter)
-        if(blogs.length==0)
+        if(!blogs)
         return res.status(404).send({status:false,msg:"No record found."})
 
         if(blogs.authorId._id.toString() !== req.authorId)
